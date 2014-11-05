@@ -10,7 +10,7 @@
  * 5 grün
  */
 
-unsigned char tiles[7][6] =
+unsigned char tiles[8][6] =
 {
     {0,1,2,3,4,5},
     {0,1,5,3,4,2},
@@ -18,12 +18,15 @@ unsigned char tiles[7][6] =
     {0,4,5,3,1,2},
     {0,3,1,4,5,2},
     {0,4,5,3,1,2},
-    {0,1,4,2,5,3}};
+    {0,1,4,2,5,3},
+    {8,8,8,8,8,8}};
 
-unsigned char positions[7] = {0,0,0,0,0,0,0};
-unsigned char rotations[7] = {0,0,0,0,0,0,0};
+unsigned char positions[7] = {7,7,7,7,7,7,7}; // positionen auf dem Spielfeld, der Wert zeigt an, welches Tile dort liegt
+unsigned char rotations[8] = {0,0,0,0,0,0,0,0};
 unsigned char available[7] = {1,1,1,1,1,1,1};
 unsigned char solutions = 0;
+
+unsigned char d;
 
 unsigned char backtrack(unsigned char pos);
 unsigned char valid(unsigned char pos, unsigned char tile, unsigned char rot);
@@ -56,17 +59,18 @@ unsigned char backtrack(unsigned char pos)
         if(available[tile]){
             available[tile] = 0;
             for(rot = 0; rot < 6; rot++){
-                rotations[tile]= rot;
+                rotations[pos]= rot;
                 if(valid(pos, tile, rot)){
+                    //printf("valid\n");
                     positions[pos] = tile;
                     if(backtrack(nextpos)){
                         solutions++;
                         print_that_solution();
                     }
-                    positions[pos] = 0;
+                    positions[pos] = 7;
                 }
             }
-            rotations[tile] = 0;
+            rotations[pos] = 0;
             available[tile] = 1;
         }
     }
@@ -76,6 +80,10 @@ unsigned char backtrack(unsigned char pos)
 
 unsigned char valid(unsigned char pos, unsigned char tile, unsigned char rot)
 {
+    //positions[pos] = tile;
+    //print_that_solution();
+    //d = getc(stdin);
+    //positions[pos] = 7;
     switch (pos) {
         case 0:
             return 1;
@@ -157,6 +165,7 @@ void print_that_solution()
            ,positions[4],rotations[4]
            ,positions[5],rotations[5]
            ,positions[6],rotations[6]);
+//    printf("available: %d%d%d%d%d%d%d", available[0],available[1],available[2],available[3],available[4],available[5],available[6]);
     printf("       / \\     / \\       \n");
     printf("      /%d %d\\   /%d %d\\      \n"
            ,tiles[positions[0]][(4+rotations[0])%6]
