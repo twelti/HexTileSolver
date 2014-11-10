@@ -25,12 +25,12 @@ unsigned char positions[7] = {7,7,7,7,7,7,7}; // positionen auf dem Spielfeld, d
 unsigned char rotations[8] = {0,0,0,0,0,0,0,0};
 unsigned char available[7] = {1,1,1,1,1,1,1};
 unsigned char solutions = 0;
-unsigned int counter = 0;
 
 unsigned char d;
+unsigned int counter = 0;
 
 unsigned char backtrack(unsigned char pos);
-unsigned char valid(unsigned char pos, unsigned char tile, unsigned char rot);
+unsigned char valid(void);
 void print_that_solution(void);
 
 
@@ -41,7 +41,7 @@ int main(void)
         printf("found\n");
         print_that_solution();
     } else
-        printf("done in %d tries.\n", counter);
+        printf("done in %d tries\n", counter);
     return 0;
 }
 
@@ -53,7 +53,10 @@ unsigned char backtrack(unsigned char pos)
     
     // done?
     if(nextpos == 8)
-        return 1;
+        if(valid()){
+            print_that_solution();
+            return 1;
+        }
     
     // we're not done yet
     for(tile = 0; tile < 7; tile++){
@@ -61,15 +64,9 @@ unsigned char backtrack(unsigned char pos)
             available[tile] = 0;
             for(rot = 0; rot < 6; rot++){
                 rotations[pos]= rot;
-                if(valid(pos, tile, rot)){
-                    //printf("valid\n");
-                    positions[pos] = tile;
-                    if(backtrack(nextpos)){
-                        solutions++;
-                        print_that_solution();
-                    }
-                    positions[pos] = 7;
-                }
+                positions[pos] = tile;
+                backtrack(nextpos);
+                positions[pos] = 7;
             }
             rotations[pos] = 0;
             available[tile] = 1;
@@ -79,76 +76,29 @@ unsigned char backtrack(unsigned char pos)
 }
 
 
-unsigned char valid(unsigned char pos, unsigned char tile, unsigned char rot)
+unsigned char valid()
 {
     //positions[pos] = tile;
     //print_that_solution();
     //d = getc(stdin);
     //positions[pos] = 7;
     counter++;
-    switch (pos) {
-        case 0:
-            return 1;
-            break;
-            
-        case 1:
-            //1.3-0.0
-            if(tiles[tile][(3+rot)%6] == tiles[positions[0]][(rotations[0] + 0)%6])
-                return 1;
-            else
-                return 0;
-            break;
-            
-        case 2:
-            //2.5-0.2
-            if(tiles[tile][(5+rot)%6] == tiles[positions[0]][(rotations[0] + 2)%6])
-                return 1;
-            else
-                return 0;
-            break;
-            
-        case 3:
-            //3.4-0.1, 3.5-1.2, 3.3-2.0
-            if(tiles[tile][(4+rot)%6] == tiles[positions[0]][(rotations[0] + 1)%6] &&
-               tiles[tile][(5+rot)%6] == tiles[positions[1]][(rotations[1] + 2)%6] &&
-               tiles[tile][(3+rot)%6] == tiles[positions[2]][(rotations[2] + 0)%6])
-                return 1;
-            else
-                return 0;
-            break;
-            
-        case 4:
-            //4.4-1.1, 4.3-3.0
-            if(tiles[tile][(4+rot)%6] == tiles[positions[1]][(rotations[1] + 1)%6] &&
-               tiles[tile][(3+rot)%6] == tiles[positions[3]][(rotations[3] + 0)%6])
-                return 1;
-            else
-                return 0;
-            break;
-            
-        case 5:
-            //5.4-2.1, 5.5-3.2
-            if(tiles[tile][(4+rot)%6] == tiles[positions[2]][(rotations[2] + 1)%6] &&
-               tiles[tile][(5+rot)%6] == tiles[positions[3]][(rotations[3] + 2)%6])
-                return 1;
-            else
-                return 0;
-            break;
-            
-        case 6:
-            //6.4-3.1, 6.3-5.0
-            if(tiles[tile][(4+rot)%6] == tiles[positions[3]][(rotations[3] + 1)%6] &&
-               tiles[tile][(3+rot)%6] == tiles[positions[5]][(rotations[5] + 0)%6])
-                return 1;
-            else
-                return 0;
-            break;
-            
-        default:
-            printf("FATAL: position overflow.\n");
-            return 0;
-            break;
-    }
+    
+    if(tiles[1][(3+rotations[1])%6] == tiles[positions[0]][(rotations[0] + 0)%6] &&
+            tiles[2][(5+rotations[2])%6] == tiles[positions[0]][(rotations[0] + 2)%6] &&
+            tiles[3][(4+rotations[3])%6] == tiles[positions[0]][(rotations[0] + 1)%6] &&
+            tiles[3][(5+rotations[3])%6] == tiles[positions[1]][(rotations[1] + 2)%6] &&
+            tiles[3][(3+rotations[3])%6] == tiles[positions[2]][(rotations[2] + 0)%6] &&
+            tiles[4][(4+rotations[4])%6] == tiles[positions[1]][(rotations[1] + 1)%6] &&
+            tiles[4][(3+rotations[4])%6] == tiles[positions[3]][(rotations[3] + 0)%6] &&
+            tiles[5][(4+rotations[5])%6] == tiles[positions[2]][(rotations[2] + 1)%6] &&
+            tiles[5][(5+rotations[5])%6] == tiles[positions[3]][(rotations[3] + 2)%6] &&
+            tiles[6][(4+rotations[6])%6] == tiles[positions[3]][(rotations[3] + 1)%6] &&
+            tiles[6][(3+rotations[6])%6] == tiles[positions[5]][(rotations[5] + 0)%6])
+        return 1;
+    else
+        return 0;
+    
     
 }
 /*
